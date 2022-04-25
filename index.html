@@ -10,18 +10,25 @@
 </head>
 
 <body>
-    
+
 
     <form id="book-form" class="book-form">
-        <input type="text" id="name">
+        <input type="text" id="name" required>
         <input type="text" id="author">
-        <input type="number" id="page-number">
-        <input type="checkbox" id="read">
+        <input type="number" id="page-number" required>
+        <input type="checkbox" id="read" required>
 
         <button type="submit">Add new Book</button>
     </form>
 
-    <ul class="book-list" id="book-list"></ul>
+    <table id="book-table">
+        <tr>
+            <th>Name</th>
+            <th>Author</th>
+            <th>Page Count</th>
+        </tr>
+
+    </table>
 
     <script src="dist/app.js"></script>
 </body>
