@@ -1,18 +1,3 @@
-const DEFAULT_DATA = [
-    {
-        title: "The Brothers Karamazov",
-        author: "Dostoevsky",
-        pageNumber: 800,
-        read: false,
-    },
-    {
-        title: "Crime and Punishment",
-        author: "Dostoevsky",
-        pageNumber: 600,
-        read: true,
-    },
-];
-const library = [...DEFAULT_DATA];
 function Book(title, author, pageNumber, read) {
     this.title = title;
     this.author = author;
@@ -22,8 +7,19 @@ function Book(title, author, pageNumber, read) {
 Book.prototype.logInfo = function () {
     return `${this.title}, by ${this.author}. Number of Pages: ${this.pageNumber}. ${this.read ? "You have read this book." : "Not read yet."}`;
 };
+Book.prototype.toggleRead = function () {
+    this.read ? (this.read = false) : (this.read = true);
+};
+const library = [];
+if (localStorage.getItem("library")) {
+    const localBooks = JSON.parse(localStorage.getItem("library"));
+    library.push(...localBooks.map((book) => {
+        return new Book(book.title, book.author, book.pageNumber, book.read);
+    }));
+}
 const addBookToLibrary = (book) => {
     library.push(book);
+    updateLocalStorage();
 };
 const bookForm = document.querySelector("#book-form");
 bookForm.addEventListener("submit", (e) => {
@@ -35,14 +31,68 @@ bookForm.addEventListener("submit", (e) => {
     const isRead = document.querySelector("#read").checked;
     addBookToLibrary(new Book(name, author, pageNumber, isRead));
     showBooks();
+    bookForm.classList.remove("show");
+    backdrop.style.display = "none";
+    bookForm.reset();
 });
 const showBooks = () => {
-    bookList.innerHTML = "";
-    library.forEach((book) => {
-        const bookElement = document.createElement("div");
-        bookElement.innerText = `${book.title}, by ${book.author}. Number of Pages: ${book.pageNumber}. ${book.read ? "Read" : "Not read"}`;
-        bookList.append(bookElement);
+    const bookGrid = document.querySelector(".books-grid");
+    bookGrid.innerHTML = "";
+    library.forEach((book, index) => {
+        bookGrid.innerHTML += createBookElement(book, index);
+    });
+    const readButtons = document.querySelectorAll(".read-button");
+    readButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const index = button.parentElement.dataset.index;
+            library[index].toggleRead();
+            showBooks();
+            updateLocalStorage();
+        });
+    });
+    const deleteButtons = document.querySelectorAll(".delete-button");
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const index = button.parentElement.dataset.index;
+            deleteBookFromLibrary(index);
+            updateLocalStorage();
+        });
     });
 };
-const bookList = document.querySelector("#book-list");
+const addButton = document.querySelector("#add-book");
+addButton.addEventListener("click", () => {
+    bookForm.classList.add("show");
+    backdrop.style.display = "block";
+    console.log("added");
+});
+const backdrop = document.querySelector(".backdrop");
+backdrop.addEventListener("click", () => {
+    bookForm.classList.remove("show");
+    backdrop.style.display = "none";
+});
 showBooks();
+function createBookElement(book, index) {
+    return `
+    <div class="book-card" data-index="${index}">
+      ${book.read ? '<span class="read-badge">READ</span>' : ""}
+      <div class="book-info">
+        <h2 class="book-title">${book.title}</h2>
+        <p class="book-author">${book.author}</p>
+       <p class="book-page-number">Number of pages: ${book.pageNumber}</p>
+      </div>
+      <button class="read-button"><i class="fa fa-check" aria-hidden="true"></i>
+      </button>
+      <button class="delete-button"><i class="fa fa-trash" aria-hidden="true"></i>
+      </button>
+    </div>
+    `;
+}
+function deleteBookFromLibrary(index) {
+    library.splice(index, 1);
+    showBooks();
+    updateLocalStorage();
+}
+function updateLocalStorage() {
+    localStorage.setItem("library", JSON.stringify(library));
+    console.log("updated");
+}
