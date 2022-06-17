@@ -36,7 +36,7 @@ bookForm.addEventListener("submit", (e) => {
     bookForm.reset();
 });
 const showBooks = () => {
-    const bookGrid = document.querySelector(".books-grid");
+    const bookGrid = document.querySelector("#books-grid");
     bookGrid.innerHTML = "";
     library.forEach((book, index) => {
         bookGrid.innerHTML += createBookElement(book, index);
@@ -75,14 +75,14 @@ function createBookElement(book, index) {
     return `
     <div class="book-card" data-index="${index}">
       ${book.read ? '<span class="read-badge">READ</span>' : ""}
-      <div class="book-info">
-        <h2 class="book-title">${book.title}</h2>
-        <p class="book-author">${book.author}</p>
-       <p class="book-page-number">Number of pages: ${book.pageNumber}</p>
+      <div class="book-card__info-box">
+        <h2 class="book-card__title">${book.title}</h2>
+        <p class="book-card__author">${book.author}</p>
+       <p class="book-card__page-number">Number of pages: ${book.pageNumber}</p>
       </div>
-      <button class="read-button"><i class="fa fa-check" aria-hidden="true"></i>
+      <button class="read-button button button-round"><i class="fa fa-check" aria-hidden="true"></i>
       </button>
-      <button class="delete-button"><i class="fa fa-trash" aria-hidden="true"></i>
+      <button class="delete-button button button-round"><i class="fa fa-trash" aria-hidden="true"></i>
       </button>
     </div>
     `;
